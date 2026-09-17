@@ -1,0 +1,14 @@
+name: agent-kit
+version: 1.0.0
+description: 自作スキル・ルールと採用した市中スキルの束。プロジェクトは apm.yml でこのパッケージを 1 行指定して apm install する
+author: koro298
+dependencies:
+  apm:
+    # draw.io 公式スキル(jgraph)。生成物は .drawio.svg(ルール diagramming 参照)
+    - jgraph/drawio-mcp/plugins/claude-code/skills/drawio#14b318b19cc37b159f841227b9d11fbd18ce18ea
+    # Excalidraw(GitHub 公式コレクション)。明示的に求められたときのみ使う
+    - github/awesome-copilot/skills/excalidraw-diagram-generator#9ce814859eaa473178a1463ee3aa0c54a8860b86
+    # スキル作成・評価(Anthropic 公式)
+    - anthropics/skills/skills/skill-creator#34040c9c568585f6929bedeaad110ad08f079624
+  mcp: []
+includes: auto
