@@ -14,12 +14,17 @@ fail() { FAILED+=("$1"); printf '警告: %s\n' "$1" >&2; }
 log "apm"
 if have apm; then
   echo "apm 既存: $(apm --version)"
+  APM_BIN="$(command -v apm)"
+  APM_REAL="$(readlink -f "$APM_BIN")"
   if have pipx && pipx list 2>/dev/null | grep -q 'package apm-cli'; then
     pipx upgrade apm-cli >/dev/null || fail "apm の更新(pipx)に失敗"
   elif [[ "$OS" == "Darwin" ]] && have brew && brew list apm >/dev/null 2>&1; then
     brew upgrade apm >/dev/null || fail "apm の更新(brew)に失敗"
-  else
+  elif [[ "$APM_REAL" == "$HOME"/* ]]; then
     curl -sSL https://aka.ms/apm-unix | sh || fail "apm の更新に失敗"
+  else
+    # ホーム外(root 権限)の導入はインストーラが上書きを拒む。手で入れ直すしかない
+    fail "apm が $APM_REAL にある。インストーラは上書きを拒否するので次で入れ直す: sudo rm -rf ${APM_REAL%/*} $APM_BIN && curl -sSL https://aka.ms/apm-unix | sh"
   fi
 elif [[ "$OS" == "Darwin" ]] && have brew; then
   brew install apm || fail "apm の導入に失敗"
