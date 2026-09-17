@@ -35,11 +35,41 @@ have apm && apm --version || fail "apm が PATH に無い"
 
 # ---- 2. crit と両ツールのプラグイン ------------------------------------------
 log "crit"
+# crit は Go でビルドする。Linux で Go が無ければ公式 tarball を ~/.local に入れる(sudo 不要)
+if ! have crit && ! have go && [[ "$OS" == "Linux" ]]; then
+  GO_VER="$(curl -fsSL 'https://go.dev/VERSION?m=text' | head -1)"
+  GO_ARCH="$(uname -m)"; [[ "$GO_ARCH" == "x86_64" ]] && GO_ARCH="amd64"; [[ "$GO_ARCH" == "aarch64" ]] && GO_ARCH="arm64"
+  if [[ -z "$GO_VER" ]]; then
+    fail "Go の最新版を取得できない"
+  else
+    GO_TMP="$(mktemp -d)"
+    if curl -fsSLo "$GO_TMP/go.tar.gz" "https://go.dev/dl/${GO_VER}.linux-${GO_ARCH}.tar.gz"; then
+      mkdir -p "$HOME/.local/bin"
+      rm -rf "$HOME/.local/go"
+      tar -C "$HOME/.local" -xzf "$GO_TMP/go.tar.gz"
+      ln -sf "$HOME/.local/go/bin/go" "$HOME/.local/bin/go"
+      ln -sf "$HOME/.local/go/bin/gofmt" "$HOME/.local/bin/gofmt"
+      export PATH="$HOME/.local/bin:$PATH"
+      echo "Go 導入: $(go version)"
+    else
+      fail "Go のダウンロードに失敗(${GO_VER}/${GO_ARCH})"
+    fi
+    rm -rf "$GO_TMP"
+  fi
+fi
+
 if ! have crit; then
   if [[ "$OS" == "Darwin" ]] && have brew; then
     brew install crit || fail "crit の導入(brew)に失敗"
   elif have go; then
-    go install github.com/tomasz-tomczyk/crit/cmd/crit@latest || fail "crit の導入(go)に失敗"
+    if go install github.com/tomasz-tomczyk/crit/cmd/crit@latest; then
+      # GOPATH/bin は PATH に無いことがあるので ~/.local/bin から張る
+      mkdir -p "$HOME/.local/bin"
+      ln -sf "$(go env GOPATH)/bin/crit" "$HOME/.local/bin/crit"
+      export PATH="$HOME/.local/bin:$PATH"
+    else
+      fail "crit の導入(go)に失敗"
+    fi
   else
     fail "crit を導入できない(brew か go が要る)"
   fi
@@ -64,7 +94,7 @@ if have crit && [[ -d "$HOME/.codex" ]]; then
     ( cd "$HOME" && crit install codex-plugin ) || fail "Codex の crit プラグイン導入に失敗"
   fi
   # crit install codex-plugin の副産物(loose skill)。プラグインと二重に見えるので除く
-  rm -rf "$HOME/.agents/skills/crit" "$HOME/.agents/skills/crit-cli"
+  rm -rf "$HOME/.agents/skills/crit" "$HOME/.agents/skills/crit-cli" "$HOME/.agents/skills/crit-story"
 fi
 
 # ---- 3. draw.io Desktop(CLI) -----------------------------------------------
