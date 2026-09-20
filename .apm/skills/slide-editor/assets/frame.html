@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>slide-editor</title>
+<style>
+/* ============================================================
+   slide-editor — 閲覧用HTMLを iframe に載せ、外から編集・発表する枠。
+   意匠は持たない。中の HTML が自前の意匠層を持っている。
+   ============================================================ */
+:root {
+  --bg: #eceef2; --panel: #ffffff; --line: #d8dde5; --ink: #16181c; --muted: #5d6470;
+  --accent: #14549b; --accent-soft: #e5edf7; --alarm: #b3231f;
+  --font: "Hiragino Sans", "Noto Sans JP", "Yu Gothic Medium", Meiryo, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); overflow: hidden; }
+
+.app { display: grid; grid-template-columns: 208px 1fr; grid-template-rows: 52px 1fr; height: 100vh; }
+body[data-present] .app { grid-template-columns: 0 1fr; grid-template-rows: 0 1fr; }
+
+.topbar {
+  grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; background: var(--panel); border-bottom: 1px solid var(--line); overflow: hidden;
+}
+.title { font-size: 13.5px; font-weight: 700; margin-right: 4px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+.sep { width: 1px; height: 22px; background: var(--line); }
+.grow { flex: 1 1 auto; }
+.btn {
+  font: inherit; font-size: 12.5px; padding: 7px 12px; border: 1px solid var(--line);
+  background: #fff; border-radius: 4px; cursor: pointer; white-space: nowrap;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:disabled { opacity: .45; cursor: default; }
+.status { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+.rail { grid-column: 1; grid-row: 2; background: var(--panel); border-right: 1px solid var(--line);
+  overflow: auto; padding: 8px; }
+.rail-item {
+  display: flex; gap: 8px; align-items: baseline; width: 100%; text-align: left;
+  font: inherit; font-size: 12px; color: var(--ink); background: none; border: 1px solid transparent;
+  border-radius: 4px; padding: 7px 8px; cursor: pointer;
+}
+.rail-item:hover { background: var(--accent-soft); }
+.rail-item[aria-current="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.rail-item .n { color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+.rail-item .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.stage { grid-column: 2; grid-row: 2; position: relative; overflow: hidden; background: var(--bg); }
+#deck { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+body[data-present] .stage { background: #000; }
+
+.drop {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  background: var(--bg); color: var(--muted); font-size: 14px; line-height: 2; padding: 32px;
+}
+.drop[hidden] { display: none; }
+.drop b { color: var(--ink); }
+.drop.over { outline: 2px dashed var(--accent); outline-offset: -16px; }
+.hint { position: fixed; right: 14px; bottom: 12px; font-size: 11.5px; color: var(--muted); }
+body[data-present] .hint { display: none; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <span class="title" id="fileName">ファイル未選択</span>
+    <span class="sep"></span>
+    <button class="btn" id="btnOpen">開く</button>
+    <button class="btn" id="btnSave" disabled>保存</button>
+    <span class="sep"></span>
+    <button class="btn" id="btnEdit" aria-pressed="false" disabled>編集</button>
+    <button class="btn" id="btnMaster" disabled>マスター</button>
+    <button class="btn" id="btnTheme" disabled>テーマ</button>
+    <span class="sep"></span>
+    <button class="btn" id="btnPresent" disabled>発表</button>
+    <span class="grow"></span>
+    <span class="status" id="status"></span>
+  </div>
+
+  <div class="rail" id="rail"></div>
+
+  <div class="stage">
+    <iframe id="deck" title="スライド"></iframe>
+    <div class="drop" id="drop">
+      <div>
+        <b>閲覧用HTML をここにドロップ</b><br>
+        または「開く」から選ぶ<br>
+        <span style="font-size:12px">slide-deck が作った `slides/&lt;name&gt;/&lt;name&gt;.html`</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="hint">← → 送り ／ E 編集 ／ F 発表 ／ Esc 戻る</div>
+
+<script>
+/* ============================================================
+   操作層と編集。閲覧用HTML は書き換えず、iframe の中で操作する。
+   保存時に #dmDeck と意匠属性だけを元のテキストへ差し戻す。
+   ============================================================ */
+(function () {
+  'use strict';
+  var MASTERS = ['report', 'jtc', 'mono'];
+  var THEMES = ['light', 'dark', 'auto'];
+
+  var el = function (id) { return document.getElementById(id); };
+  var frame = el('deck'), rail = el('rail'), drop = el('drop'), status = el('status');
+  var source = '';        /* 読み込んだ元ファイルのテキスト */
+  var handle = null;      /* File System Access のハンドル。あれば上書き保存できる */
+  var name = '';
+  var editing = false, cur = 0, dirty = false;
+
+  function say(msg) { status.textContent = msg; if (msg) setTimeout(function () {
+    if (status.textContent === msg) status.textContent = ''; }, 2600); }
+
+  function doc() { return frame.contentDocument; }
+  function holders() {
+    var d = doc(); if (!d) return [];
+    return [].slice.call(d.querySelectorAll('#dmDeck > .dm-holder'));
+  }
+
+  /* ---------- 読み込み ---------- */
+  function load(text, fileName) {
+    if (text.indexOf('id="dmDeck"') < 0) { say('閲覧用HTMLではありません'); return; }
+    source = text; name = fileName || 'slides.html';
+    el('fileName').textContent = name;
+    drop.hidden = true;
+    /* srcdoc は親のオリジンを継承するので、file:// でも中の DOM を触れる */
+    frame.srcdoc = text;
+  }
+
+  frame.addEventListener('load', function () {
+    if (!source) return;
+    injectControls();
+    buildRail();
+    go(0);
+    ['btnSave', 'btnEdit', 'btnMaster', 'btnTheme', 'btnPresent'].forEach(function (id) {
+      el(id).disabled = false;
+    });
+    say('読み込みました');
+  });
+
+  /* 中に操作層を足す。閲覧用HTML自身は束ね層しか持っていない */
+  function injectControls() {
+    var d = doc();
+    var style = d.createElement('style');
+    style.id = 'editor-overlay';
+    style.textContent = [
+      'body[data-mode="present"] .dm-stage { padding: 0; background: #000; place-items: center; }',
+      'body[data-mode="present"] .dm-holder { display: none; }',
+      'body[data-mode="present"] .dm-holder.is-current { display: block; }',
+      'body[data-mode="present"] .slide { box-shadow: none; border-radius: 0; }',
+      'body.is-editing [contenteditable="true"]:focus { outline: 2px solid #14549b; outline-offset: 3px; }',
+      '.dm-holder.is-target { outline: 2px solid #14549b; outline-offset: 6px; border-radius: 4px; }'
+    ].join('\n');
+    d.head.appendChild(style);
+    d.addEventListener('input', function () { dirty = true; }, true);
+  }
+
+  /* ---------- スライド一覧 ---------- */
+  function slideTitle(s) {
+    var t = s.querySelector('.s-title');
+    var text = t ? t.textContent.trim() : '';
+    return text || '(' + (s.dataset.layout || 'body') + ')';
+  }
+  function buildRail() {
+    rail.innerHTML = '';
+    holders().forEach(function (h, i) {
+      var s = h.querySelector('.slide'); if (!s) return;
+      var b = document.createElement('button');
+      b.className = 'rail-item';
+      b.type = 'button';
+      b.innerHTML = '<span class="n">' + (i + 1) + '</span><span class="t"></span>';
+      b.querySelector('.t').textContent = slideTitle(s);
+      b.addEventListener('click', function () { go(i); });
+      rail.appendChild(b);
+    });
+  }
+
+  function go(i) {
+    var hs = holders(); if (!hs.length) return;
+    cur = Math.max(0, Math.min(hs.length - 1, i));
+    hs.forEach(function (h, k) {
+      h.classList.toggle('is-current', k === cur);
+      h.classList.toggle('is-target', k === cur && !document.body.hasAttribute('data-present'));
+    });
+    [].slice.call(rail.children).forEach(function (b, k) {
+      b.setAttribute('aria-current', k === cur ? 'true' : 'false');
+    });
+    if (!document.body.hasAttribute('data-present')) {
+      hs[cur].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }
+
+  /* ---------- 編集 ---------- */
+  function setEditing(on) {
+    var d = doc(); if (!d) return;
+    editing = on;
+    d.body.classList.toggle('is-editing', on);
+    var deck = d.getElementById('dmDeck');
+    deck.setAttribute('contenteditable', on ? 'true' : 'false');
+    if (!on) deck.removeAttribute('contenteditable');
+    el('btnEdit').setAttribute('aria-pressed', String(on));
+    say(on ? '編集モード。文字をクリックして直す' : '編集を終了');
+  }
+
+  function cycle(attr, list, label) {
+    var d = doc(); if (!d) return;
+    var now = d.documentElement.getAttribute(attr) || list[0];
+    var next = list[(list.indexOf(now) + 1) % list.length];
+    d.documentElement.setAttribute(attr, next);
+    dirty = true;
+    say(label + ': ' + next);
+  }
+
+  /* ---------- 発表 ---------- */
+  function setPresent(on) {
+    var d = doc(); if (!d) return;
+    if (on) {
+      document.body.setAttribute('data-present', '');
+      d.body.dataset.mode = 'present';
+      if (frame.requestFullscreen) frame.requestFullscreen().catch(function () {});
+    } else {
+      document.body.removeAttribute('data-present');
+      d.body.dataset.mode = 'doc';
+      if (document.fullscreenElement) document.exitFullscreen();
+    }
+    go(cur);
+  }
+
+  /* ---------- 保存 ---------- */
+  /* 元のテキストの #dmDeck と <html> の属性だけを差し替える。意匠層・束ね層はそのまま */
+  function build() {
+    var d = doc();
+    var deck = d.getElementById('dmDeck').cloneNode(true);
+    /* 束ね層が作った holder を外し、編集の痕跡を消す */
+    [].slice.call(deck.querySelectorAll('.dm-holder')).forEach(function (h) {
+      var s = h.querySelector('.slide');
+      if (s) h.parentNode.insertBefore(s, h);
+      h.remove();
+    });
+    [].slice.call(deck.querySelectorAll('[contenteditable]')).forEach(function (n) {
+      n.removeAttribute('contenteditable');
+    });
+    [].slice.call(deck.querySelectorAll('.slide')).forEach(function (s) {
+      s.classList.remove('is-current', 'is-target');
+      s.removeAttribute('data-page');
+      s.removeAttribute('data-tabs');
+      if (!s.className.trim()) s.removeAttribute('class');
+    });
+    deck.removeAttribute('contenteditable');
+
+    var body = '\n' + deck.innerHTML.trim() + '\n';
+    var out = source.replace(
+      /(<div class="dm-deck" id="dmDeck">)[\s\S]*?(<\/div><!-- \/\.dm-deck -->)/,
+      function (_m, a, b) { return a + body + b; }
+    );
+    /* 意匠属性 */
+    ['data-master', 'data-theme'].forEach(function (attr) {
+      var v = d.documentElement.getAttribute(attr);
+      if (!v) return;
+      var re = new RegExp('(<html[^>]*?)\\s' + attr + '="[^"]*"');
+      out = re.test(out) ? out.replace(re, '$1 ' + attr + '="' + v + '"')
+                         : out.replace(/<html/, '<html ' + attr + '="' + v + '"');
+    });
+    return out;
+  }
+
+  async function save() {
+    var text = build();
+    if (handle) {
+      try {
+        var w = await handle.createWritable();
+        await w.write(text); await w.close();
+        source = text; dirty = false; say('保存しました');
+        return;
+      } catch (e) { say('上書きできないのでダウンロードします'); }
+    }
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/html' }));
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    source = text; dirty = false;
+    say('ダウンロードしました。元のファイルと差し替えてください');
+  }
+
+  /* ---------- 入口 ---------- */
+  async function open() {
+    if (window.showOpenFilePicker) {
+      try {
+        var picked = await window.showOpenFilePicker({
+          types: [{ description: 'HTML', accept: { 'text/html': ['.html', '.htm'] } }]
+        });
+        handle = picked[0];
+        var f = await handle.getFile();
+        load(await f.text(), f.name);
+        return;
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    var input = document.createElement('input');
+    input.type = 'file'; input.accept = '.html,.htm';
+    input.addEventListener('change', function () {
+      var f = input.files[0]; if (!f) return;
+      handle = null;
+      f.text().then(function (t) { load(t, f.name); });
+    });
+    input.click();
+  }
+
+  ['dragenter', 'dragover'].forEach(function (t) {
+    drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('over'); });
+  });
+  ['dragleave', 'drop'].forEach(function (t) {
+    drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('over'); });
+  });
+  drop.addEventListener('drop', function (e) {
+    var f = e.dataTransfer.files[0]; if (!f) return;
+    handle = null;
+    f.text().then(function (t) { load(t, f.name); });
+  });
+
+  el('btnOpen').addEventListener('click', open);
+  el('btnSave').addEventListener('click', save);
+  el('btnEdit').addEventListener('click', function () { setEditing(!editing); });
+  el('btnMaster').addEventListener('click', function () { cycle('data-master', MASTERS, 'マスター'); });
+  el('btnTheme').addEventListener('click', function () { cycle('data-theme', THEMES, 'テーマ'); });
+  el('btnPresent').addEventListener('click', function () { setPresent(true); });
+
+  function keys(e) {
+    if (editing && e.key.length === 1) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { go(cur + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { go(cur - 1); e.preventDefault(); }
+    else if (e.key === 'Escape') { setPresent(false); }
+    else if (e.key === 'e' || e.key === 'E') { setEditing(!editing); }
+    else if (e.key === 'f' || e.key === 'F') { setPresent(true); }
+    else if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); save(); }
+  }
+  document.addEventListener('keydown', keys);
+  frame.addEventListener('load', function () { doc().addEventListener('keydown', keys); });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* 自動テストとエージェントからの操作用。人が使う分には要らない */
+  window.SlideEditor = {
+    load: load, build: build, go: go, setEditing: setEditing,
+    slideCount: function () { return holders().length; }
+  };
+})();
+</script>
+</body>
+</html>
