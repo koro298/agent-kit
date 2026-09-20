@@ -8,7 +8,8 @@ Claude Code と Codex に配る自作スキル・自作ルール・採用した�
 |---|---|---|
 | desk-loop | 自作スキル | `.apm/skills/desk-loop/` |
 | smart-commit | 自作スキル | `.apm/skills/smart-commit/` |
-| deck(HTML スライド) | 自作スキル | `.apm/skills/deck/` |
+| slide-deck(スライド作成) | 自作スキル | `.apm/skills/slide-deck/` |
+| slide-editor(スライド編集・発表) | 自作スキル | `.apm/skills/slide-editor/` |
 | doc-style | 自作ルール(全ファイル) | `.apm/instructions/doc-style.instructions.md` |
 | python-coding | 自作ルール(`**/*.py`、`pyproject.toml`) | `.apm/instructions/python-coding.instructions.md` |
 | diagramming | 自作ルール(作図ファイル) | `.apm/instructions/diagramming.instructions.md` |
