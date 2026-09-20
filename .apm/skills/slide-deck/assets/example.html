@@ -1,0 +1,1332 @@
+<!doctype html>
+<html lang="ja" data-theme="light" data-master="report">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTMLスライド 標準フォーマット 見本</title>
+<style id="deck-style">
+/* ============================================================
+   document-maker / deck.html  —  標準スライドフォーマット v1
+   1. デザイントークン
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  color-scheme: light;
+  --bg: #f7f8fa; --surface: #ffffff; --surface-2: #f1f4f8;
+  --ink: #15181c; --ink-2: #343c46; --muted: #626b77;
+  --line: #dfe4ea; --line-2: #b4bfcb;
+  --accent: #14549b; --accent-soft: #e7eff8; --accent-line: #a6c1dd;
+  --warn: #4a6580; --warn-soft: #eef2f6; --warn-line: #b7c5d3;
+  --alarm: #b03a39; --alarm-soft: #fbeceb; --alarm-line: #e3b3b0;
+  --code-bg: #f0f3f7;
+  --shadow: none;                        /* 本文の箱に影は落とさない */
+  --shadow-lift: 0 2px 6px rgba(20,24,28,.06), 0 24px 56px -28px rgba(20,24,28,.38);
+
+  /* 台紙（エディタのUI面。スライドの外側） */
+  --app-bg: #e7eaee; --app-panel: #ffffff; --app-line: #d2d8df;
+  --app-ink: #2a2f35; --app-muted: #6b727a;
+
+  /* 版面 */
+  --slide-w: 1280px; --slide-h: 720px;
+  --pad-x: 82px; --pad-y: 60px;
+  --r-s: 2px; --r-m: 2px; --r-l: 3px;     /* 角の丸み。ほぼ直角 */
+  --title-c: var(--ink);                   /* スライドタイトルの色 */
+  --fs: 20px;                              /* 本文の基準サイズ。書体差をここで吸収する */
+
+  --font-ja: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+             "Yu Gothic Medium", Meiryo, system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    color-scheme: dark;
+    --bg: #0d1116; --surface: #151a21; --surface-2: #1a212a;
+    --ink: #e8ecf2; --ink-2: #c2cad4; --muted: #929cab;
+    --line: #262e39; --line-2: #3a4553;
+    --accent: #6aa9e0; --accent-soft: #12202f; --accent-line: #2a4257;
+    --warn: #8fa6bd; --warn-soft: #1a222c; --warn-line: #33414f;
+    --alarm: #ef6a63; --alarm-soft: #2e1715; --alarm-line: #5c2b27;
+    --code-bg: #161d26;
+    --shadow: none;
+    --shadow-lift: 0 2px 8px rgba(0,0,0,.5), 0 28px 64px -30px rgba(0,0,0,.9);
+    --app-bg: #0a0b0d; --app-panel: #16191d; --app-line: #282d33;
+    --app-ink: #e9eaec; --app-muted: #949ba3;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d1116; --surface: #151a21; --surface-2: #1a212a;
+  --ink: #e8ecf2; --ink-2: #c2cad4; --muted: #929cab;
+  --line: #262e39; --line-2: #3a4553;
+  --accent: #6aa9e0; --accent-soft: #12202f; --accent-line: #2a4257;
+  --warn: #8fa6bd; --warn-soft: #1a222c; --warn-line: #33414f;
+  --alarm: #ef6a63; --alarm-soft: #2e1715; --alarm-line: #5c2b27;
+  --code-bg: #161d26;
+  --shadow: none;
+  --shadow-lift: 0 2px 8px rgba(0,0,0,.5), 0 28px 64px -30px rgba(0,0,0,.9);
+  --app-bg: #0a0b0d; --app-panel: #16191d; --app-line: #282d33;
+  --app-ink: #e9eaec; --app-muted: #949ba3;
+}
+
+/* ============================================================
+   1.5 スライドマスター
+   <html data-master="report | jtc | mono">
+   report … 既定。読み物寄り。余白を広めに取り、文章主体の資料向け
+   jtc    … 密度重視。文字・余白・表をひとまわり詰めて1枚に載せる
+   mono   … 投影・白黒印刷向け。黒＋朱の1色、罫のみ、角丸ゼロ
+   ============================================================ */
+
+/* ---------- jtc（1枚に詰めたいとき） ---------- */
+:root[data-master="jtc"] {
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f4f6f9;
+  --ink: #14181d; --ink-2: #2f3640; --muted: #5a636e;
+  --line: #d3d9e2; --line-2: #a8b3c1;
+  --accent: #1f4e79; --accent-soft: #e8eef5; --accent-line: #9db4cb;
+  --warn: #45607c; --warn-soft: #eef2f7; --warn-line: #b2c2d3;
+  --alarm: #b02318; --alarm-soft: #fbecea; --alarm-line: #e3b2ac;
+  --code-bg: #f1f3f7;
+  --shadow: none;
+  --shadow-lift: 0 2px 6px rgba(20,24,29,.08), 0 20px 46px -28px rgba(20,24,29,.35);
+  --r-s: 2px; --r-m: 3px; --r-l: 3px;
+  --pad-x: 40px; --pad-y: 24px;
+  --title-c: var(--accent);
+  --fs: 18.5px;   /* 14pt 相当。JTC資料の本文はこのあたりが標準 */
+  --font-ja: "Yu Gothic Medium", "Yu Gothic", Meiryo, "Hiragino Sans",
+             "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-master="jtc"][data-theme="auto"] {
+    --bg: #0d1116; --surface: #151b22; --surface-2: #1a222b;
+    --ink: #e7ebf0; --ink-2: #c3cbd5; --muted: #94a0ad;
+    --line: #262f3a; --line-2: #3b4755;
+    --accent: #7fb0dc; --accent-soft: #12202e; --accent-line: #2a4359;
+    --warn: #93a9c0; --warn-soft: #19212b; --warn-line: #33414f;
+    --alarm: #ec6a5f; --alarm-soft: #2d1714; --alarm-line: #5a2a25;
+    --code-bg: #161e27;
+    --app-bg: #080c10; --app-panel: #151b22; --app-line: #262f3a;
+    --app-ink: #e7ebf0; --app-muted: #94a0ad;
+  }
+}
+:root[data-master="jtc"][data-theme="dark"] {
+  --bg: #0d1116; --surface: #151b22; --surface-2: #1a222b;
+  --ink: #e7ebf0; --ink-2: #c3cbd5; --muted: #94a0ad;
+  --line: #262f3a; --line-2: #3b4755;
+  --accent: #7fb0dc; --accent-soft: #12202e; --accent-line: #2a4359;
+  --warn: #93a9c0; --warn-soft: #19212b; --warn-line: #33414f;
+  --alarm: #ec6a5f; --alarm-soft: #2d1714; --alarm-line: #5a2a25;
+  --code-bg: #161e27;
+  --app-bg: #080c10; --app-panel: #151b22; --app-line: #262f3a;
+  --app-ink: #e7ebf0; --app-muted: #94a0ad;
+}
+
+/* ---------- mono ---------- */
+:root[data-master="mono"] {
+  --bg: #fbfbf9; --surface: #ffffff; --surface-2: #f3f3f0;
+  --ink: #111111; --ink-2: #33332f; --muted: #6b6b66;
+  --line: #d9d9d4; --line-2: #adada7;
+  --accent: #1b1b1b; --accent-soft: #efefec; --accent-line: #bdbdb7;
+  --warn: #6b6b66; --warn-soft: #f3f3f0; --warn-line: #cfcfc9;
+  --alarm: #c2342a; --alarm-soft: #fbefed; --alarm-line: #e2b4ae;
+  --code-bg: #f1f1ee;
+  --shadow: none;
+  --shadow-lift: 0 1px 2px rgba(0,0,0,.06), 0 18px 40px -26px rgba(0,0,0,.35);
+  --r-s: 0px; --r-m: 0px; --r-l: 0px;
+  --pad-x: 74px; --pad-y: 54px;
+  --title-c: var(--ink);
+  --fs: 20px;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-master="mono"][data-theme="auto"] {
+    --bg: #0f0f0e; --surface: #171716; --surface-2: #1d1d1b;
+    --ink: #f0efec; --ink-2: #cfcec9; --muted: #98978f;
+    --line: #2c2c29; --line-2: #43433f;
+    --accent: #f0efec; --accent-soft: #232320; --accent-line: #45453f;
+    --warn: #a9a79d; --warn-soft: #232320; --warn-line: #45453f;
+    --alarm: #e2665b; --alarm-soft: #2a1715; --alarm-line: #552b26;
+    --code-bg: #1c1c1a;
+    --app-bg: #0a0a09; --app-panel: #171716; --app-line: #2c2c29;
+    --app-ink: #f0efec; --app-muted: #98978f;
+  }
+}
+:root[data-master="mono"][data-theme="dark"] {
+  --bg: #0f0f0e; --surface: #171716; --surface-2: #1d1d1b;
+  --ink: #f0efec; --ink-2: #cfcec9; --muted: #98978f;
+  --line: #2c2c29; --line-2: #43433f;
+  --accent: #f0efec; --accent-soft: #232320; --accent-line: #45453f;
+  --warn: #a9a79d; --warn-soft: #232320; --warn-line: #45453f;
+  --alarm: #e2665b; --alarm-soft: #2a1715; --alarm-line: #552b26;
+  --code-bg: #1c1c1a;
+  --app-bg: #0a0a09; --app-panel: #171716; --app-line: #2c2c29;
+  --app-ink: #f0efec; --app-muted: #98978f;
+}
+
+/* ============================================================
+   2. 台紙とステージ（スライドの外側）
+   ============================================================ */
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--app-bg); color: var(--app-ink);
+  font-family: var(--font-ja); -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* 既定（＝閲覧専用で書き出したとき）はクロムなしの全面表示。
+   エディタCSSがあるときだけツールバーとレールの行・列が開く。 */
+.dm-app { display: grid; grid-template-columns: 0 1fr; grid-template-rows: 0 1fr;
+  height: 100vh; transition: grid-template-columns .18s ease, grid-template-rows .18s ease; }
+
+.dm-topbar { grid-column: 1 / -1; grid-row: 1; overflow: hidden; }
+.dm-rail   { grid-column: 1; grid-row: 2; overflow: hidden; }
+.dm-stage  { grid-column: 2; grid-row: 2; }
+body[data-mode="view"] .dm-stage, body[data-mode="present"] .dm-stage { grid-column: 1 / -1; }
+body[data-mode="grid"] .dm-stage { grid-column: 1 / -1; }
+
+.dm-stage {
+  position: relative; overflow: auto; display: grid; place-items: center;
+  padding: 24px; background: var(--app-bg);
+}
+body[data-mode="present"] { background: #000; }
+body[data-mode="present"] .dm-stage { background: #000; padding: 0; }
+body[data-mode="grid"] .dm-stage { place-items: start center; padding: 28px; }
+
+/* スライドの入れ物。scale後の実寸を持つ */
+.dm-holder {
+  position: relative; flex: none;
+  width: calc(var(--slide-w) * var(--s, 1));
+  height: calc(var(--slide-h) * var(--s, 1));
+}
+.dm-stage { --s: 1; }
+
+.dm-deck { display: contents; }
+body[data-mode="grid"] .dm-deck {
+  display: grid; gap: 26px 22px; width: 100%;
+  grid-template-columns: repeat(var(--cols, 3), max-content);
+  justify-content: center; align-content: start;
+}
+/* 閲覧・編集時は現在のスライドだけ見せる */
+body:not([data-mode="grid"]) .dm-holder { display: none; }
+body:not([data-mode="grid"]) .dm-holder.is-current { display: block; }
+
+/* ============================================================
+   3. スライド版面
+   ============================================================ */
+.slide {
+  position: absolute; top: 0; left: 0;
+  width: var(--slide-w); height: var(--slide-h);
+  transform: scale(var(--s, 1)); transform-origin: top left;
+  background: var(--bg); color: var(--ink);
+  font-size: var(--fs); line-height: 1.7; font-feature-settings: "palt" 1;
+  padding: var(--pad-y) var(--pad-x);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-lift);
+  border-radius: 4px;
+}
+body[data-mode="present"] .slide { box-shadow: none; border-radius: 0; }
+
+/* 共通クロム：走りラベルとページ番号 */
+.slide[data-chapter]:not([data-chapter=""])::before {
+  content: attr(data-chapter);
+  position: absolute; top: 26px; left: var(--pad-x);
+  font-size: 12px; letter-spacing: .13em; font-weight: 700; color: var(--muted);
+}
+.slide[data-page]::after {
+  content: attr(data-page) " / " attr(data-total);
+  position: absolute; bottom: 24px; right: var(--pad-x);
+  font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.slide[data-layout="cover"]::before, .slide[data-layout="cover"]::after,
+.slide[data-layout="statement"]::before, .slide[data-layout="statement"]::after,
+.slide[data-nochrome]::before, .slide[data-nochrome]::after { content: none; }
+
+/* 本文領域 */
+.s-main { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+
+/* ---- 見出しまわり ---- */
+.s-kicker { font-size: 14px; letter-spacing: .13em; color: var(--accent); font-weight: 700; margin-bottom: 18px; }
+.s-title {
+  font-size: 34px; font-weight: 700; line-height: 1.35; margin: 0;
+  letter-spacing: -.01em; display: flex; align-items: baseline; gap: 14px;
+  color: var(--title-c);
+}
+.s-title .n {
+  font-size: 14px; color: var(--accent); border: 1px solid var(--accent-line);
+  background: var(--accent-soft); border-radius: var(--r-s); padding: 3px 10px;
+  font-weight: 700; flex: none; letter-spacing: .04em;
+}
+.s-lead { font-size: 18px; color: var(--ink-2); margin: 10px 0 0; max-width: 62ch; }
+.s-rule { height: 1px; background: var(--line); margin: 18px 0 26px; flex: none; }
+
+/* ---- layout: cover ---- */
+.slide[data-layout="cover"] { justify-content: center; padding: var(--pad-y) 96px; }
+.slide[data-layout="cover"] .s-title { font-size: 54px; line-height: 1.28; display: block; }
+.slide[data-layout="cover"] .s-lead { font-size: 20px; margin-top: 24px; max-width: 58ch; }
+.s-meta { margin-top: 34px; font-size: 14px; color: var(--muted); display: flex; gap: 26px; flex-wrap: wrap; }
+.s-meta b { font-weight: 700; color: var(--ink-2); }
+
+/* ---- layout: section ---- */
+.slide[data-layout="section"] { justify-content: center; }
+.slide[data-layout="section"] .s-bignum {
+  font-size: 15px; font-weight: 700; letter-spacing: .18em; color: var(--accent);
+  margin-bottom: 14px;
+}
+.slide[data-layout="section"] .s-title { font-size: 46px; display: block; }
+.slide[data-layout="section"] .s-lead { margin-top: 18px; font-size: 19px; }
+.slide[data-layout="section"] .s-rule { max-width: 96px; height: 3px; background: var(--accent); margin: 26px 0 0; }
+
+/* ---- layout: statement ---- */
+.slide[data-layout="statement"] {
+  justify-content: center; align-items: center; text-align: center;
+  background: var(--accent-soft);
+}
+.slide[data-layout="statement"] .s-title { font-size: 40px; line-height: 1.5; display: block; max-width: 24ch; }
+.slide[data-layout="statement"] .s-lead { margin-top: 22px; text-align: center; max-width: 52ch; }
+
+/* ---- layout: agenda ---- */
+.s-agenda { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 56px; }
+.s-agenda li {
+  break-inside: avoid; display: flex; gap: 14px; align-items: baseline;
+  padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 19px;
+}
+.s-agenda .num { font-size: 13px; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; flex: none; }
+.s-agenda .sub { font-size: 14px; color: var(--muted); margin-left: auto; flex: none; }
+
+/* ---- layout: split ---- */
+.s-cols { display: grid; grid-template-columns: var(--split, 1fr 1fr); gap: 16px; align-content: start; }
+/* 高さを詰めるのは split レイアウトで唯一の中身のときだけ。
+   body レイアウトの途中に置くと、後ろのブロックを版面の外へ押し出してしまう */
+.slide[data-layout="split"] .s-main > .s-cols { height: 100%; }
+.s-col { min-width: 0; }
+
+/* ---- layout: visual ---- */
+.slide[data-layout="visual"] .s-title { font-size: 26px; }
+.slide[data-layout="visual"] .s-rule { margin: 14px 0 18px; }
+.slide[data-layout="visual"] .s-main { display: flex; flex-direction: column; }
+.slide[data-layout="visual"] [data-block="figure"] { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+/* figure は素のブロックなので、ここで flex を通さないと figbox が伸び縮みしない */
+.slide[data-layout="visual"] [data-block="figure"] > figure { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.slide[data-layout="visual"] [data-block="figure"] .figbox { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+.slide[data-layout="visual"] [data-block="figure"] figcaption,
+.slide[data-layout="visual"] [data-block="embed"] figcaption { flex: none; }
+
+/* ---- layout: closing ---- */
+.slide[data-layout="closing"] { justify-content: center; }
+.slide[data-layout="closing"] .s-title { font-size: 40px; display: block; }
+
+/* ============================================================
+   4. コンテンツブロック
+   ============================================================ */
+[data-block] { margin: 0 0 12px; }
+[data-block]:last-child { margin-bottom: 0; }
+
+/* heading / text / list */
+[data-block="heading"] h3 { font-size: 24px; font-weight: 700; margin: 0; line-height: 1.5; }
+[data-block="heading"] h3::before {
+  content: ""; display: inline-block; width: 4px; height: .82em; border-radius: 2px;
+  background: var(--accent); margin-right: 11px; vertical-align: -.06em;
+}
+[data-block="text"] p { margin: 0 0 12px; max-width: 64ch; }
+[data-block="text"] p:last-child { margin-bottom: 0; }
+[data-block="list"] ul, [data-block="list"] ol { margin: 0; padding-left: 1.4em; max-width: 64ch; }
+[data-block="list"] li { margin-bottom: 9px; }
+[data-block="list"] li:last-child { margin-bottom: 0; }
+[data-block="list"] ul { list-style: none; padding-left: 0; }
+[data-block="list"] ul > li { position: relative; padding-left: 22px; }
+[data-block="list"] ul > li::before {
+  content: ""; position: absolute; left: 3px; top: .62em;
+  width: 7px; height: 7px; border-radius: 2px; background: var(--accent-line);
+  border: 1px solid var(--accent); box-sizing: border-box;
+}
+[data-block="list"] ol { font-variant-numeric: tabular-nums; }
+
+/* インライン装飾 */
+strong { font-weight: 700; }
+.ok  { color: var(--accent); font-weight: 700; }
+.mid { color: var(--warn);   font-weight: 700; }
+.ng  { color: var(--alarm);  font-weight: 700; }
+code {
+  font-family: var(--font-mono); font-size: .86em; background: var(--code-bg);
+  padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line); white-space: nowrap;
+}
+a { color: var(--accent); }
+
+/* callout: note / warn / key */
+/* 地は白・全辺同じ細罫。違いは見出しの文字色だけで示す */
+.note, .warnbox, .keybox {
+  border-radius: var(--r-s); padding: 11px 14px; font-size: 18px; line-height: 1.68;
+  background: var(--surface); border: 1px solid var(--line-2);
+}
+.note .lbl, .warnbox .lbl, .keybox .lbl {
+  display: block; font-size: 12px; letter-spacing: .11em; font-weight: 700; margin-bottom: 6px;
+}
+.note .lbl { color: var(--accent); } .warnbox .lbl { color: var(--warn); } .keybox .lbl { color: var(--ink); }
+.note p, .warnbox p, .keybox p { margin: 0 0 9px; }
+.note :last-child, .warnbox :last-child, .keybox :last-child { margin-bottom: 0; }
+
+/* table */
+.tw { overflow: hidden; border: 1px solid var(--line-2); border-radius: var(--r-s); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 17px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.55; }
+thead th {
+  background: var(--surface-2); font-size: 13px; letter-spacing: .05em;
+  color: var(--muted); font-weight: 700; white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+.num-cell { font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+table.compact { font-size: 15.5px; }
+table.compact th, table.compact td { padding: 7px 11px; }
+
+/* steps */
+.steps { display: grid; gap: 6px; }
+.step {
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-s);
+  padding: 14px 18px;
+  display: grid; grid-template-columns: 64px 1fr; gap: 16px; align-items: start;
+}
+.step .sn {
+  font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .08em;
+  border: 1px solid var(--accent-line); background: var(--accent-soft);
+  border-radius: var(--r-s); text-align: center; padding: 4px 0;
+}
+.step h4 { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+.step p { font-size: 16px; color: var(--ink-2); margin: 0; line-height: 1.62; }
+
+/* cards */
+.cards { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 8px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-s);
+  padding: 16px 18px;
+}
+.card .pn { font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--accent); }
+.card .pt { font-size: 18px; font-weight: 700; margin: 4px 0 6px; line-height: 1.45; }
+.card .pd { font-size: 15.5px; color: var(--muted); line-height: 1.65; }
+
+/* kpi */
+.kpis { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 8px; }
+.kpi {
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-s);
+  padding: 16px 20px;
+}
+.kpi .kl { font-size: 13px; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+.kpi .kv {
+  font-size: 40px; font-weight: 700; line-height: 1.15; margin: 6px 0 2px;
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent);
+}
+.kpi .kv .u { font-size: 18px; font-weight: 700; margin-left: 4px; letter-spacing: 0; }
+.kpi .kn { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.kpi[data-tone="warn"]  .kv { color: var(--warn); }
+.kpi[data-tone="alarm"] .kv { color: var(--alarm); }
+.kpi[data-tone="plain"] .kv { color: var(--ink); }
+
+/* qa */
+.qa { padding-left: 0; margin-bottom: 10px; }
+.qa:last-child { margin-bottom: 0; }
+.qa .q { font-weight: 700; font-size: 18px; margin-bottom: 3px; color: var(--accent); }
+.qa .a { font-size: 16.5px; color: var(--ink-2); margin: 0; line-height: 1.66; }
+
+/* figure */
+figure { margin: 0; }
+.figbox {
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-s);
+  padding: 18px; overflow: hidden;
+}
+.figbox > svg, .figbox > img { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+figcaption { font-size: 14px; color: var(--muted); margin-top: 9px; }
+
+/* code */
+[data-block="code"] pre {
+  margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: var(--r-m);
+  padding: 14px 18px; overflow: auto; font-size: 16px; line-height: 1.62;
+}
+[data-block="code"] pre code { background: none; border: 0; padding: 0; white-space: pre; font-size: inherit; }
+
+/* flow: 横に並ぶ工程 */
+.flow { display: flex; align-items: stretch; }
+.fl-node {
+  flex: 1 1 0; min-width: 0; background: var(--surface); border: 1px solid var(--line-2);
+  border-radius: var(--r-s); padding: 14px 16px;
+}
+.fl-node b { display: block; font-size: 17px; font-weight: 700; margin-bottom: 5px; line-height: 1.4; }
+.fl-node span { display: block; font-size: 14.5px; color: var(--muted); line-height: 1.62; }
+.fl-node[data-tone="accent"] { background: var(--accent-soft); border-color: var(--accent-line); }
+.fl-node[data-tone="mute"] { background: var(--surface-2); box-shadow: none; }
+.fl-node[data-tone="alarm"] { background: var(--alarm-soft); border-color: var(--alarm-line); }
+.fl-arrow {
+  flex: 0 0 var(--aw, 92px); display: grid; grid-template-rows: 1fr auto 1fr;
+  align-items: center; justify-items: center; padding: 0 4px;
+}
+.fl-arrow i { font-style: normal; font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.45; }
+.fl-arrow svg { width: 100%; height: 11px; display: block; }
+.fl-arrow svg line { stroke: var(--line-2); stroke-width: 1.5; }
+.fl-arrow svg path { fill: var(--line-2); }
+
+/* bars: 横棒の比較 */
+.bars { display: grid; gap: 7px; }
+.bar { display: grid; grid-template-columns: var(--lw, 180px) 1fr var(--vw, 116px); gap: 14px; align-items: center; }
+.bar .bl { font-size: 15.5px; color: var(--ink-2); line-height: 1.45; }
+.bar .bt {
+  position: relative; height: 17px; border-radius: var(--r-s);
+  background: var(--surface-2); border: 1px solid var(--line); overflow: hidden;
+}
+.bar .bt::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--w, 50%);
+  min-width: 3px;                     /* 極端に短い棒も存在が見えるように */
+  background: var(--accent-line); border-right: 2px solid var(--accent);
+}
+.bar[data-tone="warn"]  .bt::before { background: var(--warn-soft);  border-right-color: var(--warn); }
+.bar[data-tone="alarm"] .bt::before { background: var(--alarm-soft); border-right-color: var(--alarm); }
+.bar[data-tone="mute"]  .bt::before { background: var(--line);       border-right-color: var(--line-2); }
+.bar .bv { font-size: 15.5px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.bar .bv small { font-size: 12.5px; font-weight: 400; color: var(--muted); margin-left: 3px; }
+
+/* stack: 層の積み重ね */
+.stack { display: grid; gap: 6px; }
+.st-row {
+  display: grid; grid-template-columns: var(--kw, 116px) 1fr var(--nw, 250px); gap: 16px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-s);
+  padding: 13px 18px;
+}
+.st-row .st-k { font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+.st-row .st-b { font-size: 17px; font-weight: 700; line-height: 1.45; }
+.st-row .st-b small { display: block; font-size: 14px; font-weight: 400; color: var(--ink-2); margin-top: 2px; }
+.st-row .st-n { font-size: 13.5px; color: var(--muted); text-align: right; line-height: 1.55; }
+.st-row[data-tone="accent"] { background: var(--accent-soft); border-color: var(--accent-line); }
+.st-row[data-tone="accent"] .st-k, .st-row[data-tone="accent"] .st-n { color: var(--accent); }
+.st-row[data-tone="mute"] { background: var(--surface-2); box-shadow: none; }
+
+/* chain: 日をまたいでつながる鎖 */
+.chain { display: flex; align-items: stretch; }
+.ch-cell {
+  flex: 1 1 0; min-width: 0; text-align: center; background: var(--surface);
+  border: 1px solid var(--line-2); border-radius: var(--r-s); padding: 11px 6px;
+}
+.ch-cell b { display: block; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ch-cell span { display: block; font-size: 16px; font-weight: 700; margin: 3px 0 2px; }
+.ch-cell i { display: block; font-style: normal; font-size: 12.5px; color: var(--muted); }
+.ch-cell[data-tone="accent"] { background: var(--accent-soft); border-color: var(--accent-line); }
+.ch-cell[data-tone="alarm"]  { background: var(--alarm-soft);  border-color: var(--alarm-line); }
+.ch-cell[data-tone="warn"]   { background: var(--warn-soft);   border-color: var(--warn-line); }
+.ch-cell[data-tone="mute"]   { background: var(--surface-2); box-shadow: none; color: var(--muted); }
+.ch-link { flex: 0 0 24px; position: relative; }
+.ch-link::before { content: ""; position: absolute; left: 3px; right: 3px; top: 50%; border-top: 1.5px solid var(--accent-line); }
+.ch-lab { font-size: 12.5px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+/* roadmap: 年度 × ワークストリームの工程表（ガントの簡略形）
+   横位置はすべて「列番号」で指定する。--cols で総列数を宣言し、
+   各要素は --a（開始列）と --b（終了列＝その手前まで）を持つ。 */
+.rm {
+  --cols: 24; --lw: 96px; --tip: 11px;
+  --rm-hi: #cfe0f2; --rm-hi-line: #7aa6d0;
+  font-size: 13px; line-height: 1.35;
+}
+:root[data-theme="dark"] .rm { --rm-hi: #1d3348; --rm-hi-line: #47698c; }
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .rm { --rm-hi: #1d3348; --rm-hi-line: #47698c; }
+}
+.rm-row, .rm-sec { display: grid; grid-template-columns: var(--lw) 1fr; gap: 0 8px; }
+/* グループの中の行はラベル列を持たない */
+.rm-sec-body .rm-row { grid-template-columns: 1fr; }
+.rm-sec-body > .rm-sec { --lw: 40px; margin-bottom: 4px; }
+.rm-row { align-items: center; margin-bottom: 5px; }
+.rm-sec { align-items: stretch; margin-bottom: 7px; }
+.rm-track { display: grid; grid-template-columns: repeat(var(--cols), 1fr); align-items: center; }
+.rm-lab {
+  font-size: 12px; font-weight: 700; color: var(--ink-2);
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+/* 縦書きのグループ見出し */
+.rm-lab--v {
+  writing-mode: vertical-rl; text-orientation: upright; letter-spacing: .08em;
+  border: 1px solid var(--line-2); border-radius: var(--r-s); background: var(--surface-2);
+  padding: 8px 2px;
+}
+
+/* 年度ヘッダ */
+.rm-y {
+  grid-column: var(--a) / var(--b); background: var(--accent); color: var(--surface);
+  font-weight: 700; font-size: 14px; text-align: center; padding: 4px 10px 4px 8px;
+  margin-right: 3px;
+  clip-path: polygon(0 0, calc(100% - var(--tip)) 0, 100% 50%, calc(100% - var(--tip)) 100%, 0 100%);
+}
+
+/* マイルストン */
+.rm-m { grid-column: var(--a) / span var(--w, 3); text-align: center; padding: 0 2px; }
+.rm-m::before { content: "▼"; display: block; font-size: 11px; color: var(--ink-2); line-height: 1; margin-bottom: 2px; }
+.rm-m b { display: block; font-size: 12px; font-weight: 700; }
+.rm-m i { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rm-m[data-tone="key"]::before, .rm-m[data-tone="key"] b, .rm-m[data-tone="key"] i { color: var(--alarm); }
+
+/* バー（既定＝白地に枠のシェブロン）。枠は二層で描く */
+.rm-bar {
+  grid-column: var(--a) / var(--b); position: relative; min-height: 30px;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  margin: 2px 3px 2px 0; padding: 4px 14px 4px 8px; color: var(--ink);
+  background: var(--accent);
+  clip-path: polygon(0 0, calc(100% - var(--tip)) 0, 100% 50%, calc(100% - var(--tip)) 100%, 0 100%);
+}
+.rm-bar::before {
+  content: ""; position: absolute; inset: 1.5px;
+  background: var(--surface);
+  clip-path: polygon(0 0, calc(100% - var(--tip)) 0, 100% 50%, calc(100% - var(--tip)) 100%, 0 100%);
+}
+.rm-bar > span { position: relative; z-index: 1; }
+.rm-bar b { display: block; font-weight: 700; }
+.rm-bar i { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.rm-bar[data-tone="hi"] { background: var(--rm-hi-line); }
+.rm-bar[data-tone="hi"]::before { background: var(--rm-hi); }
+.rm-bar[data-tone="fill"] { background: var(--accent); color: var(--surface); }
+.rm-bar[data-tone="fill"]::before { background: var(--accent); }
+.rm-bar[data-tone="fill"] i { color: var(--surface); opacity: .85; }
+/* 未確定は破線。矢じりも破線で描くため、クリップをやめて矩形＋回転した角にする */
+.rm-bar[data-tone="plan"] {
+  background: none; clip-path: none; border: 1.5px dashed var(--accent-line);
+  margin-right: calc(var(--tip) + 3px); color: var(--ink-2);
+}
+.rm-bar[data-tone="plan"]::before { content: none; }
+.rm-bar[data-tone="plan"]::after {
+  content: ""; position: absolute; right: calc(-1 * var(--tip)); top: 50%;
+  width: calc(var(--tip) - 1px); height: calc(var(--tip) - 1px);
+  border-top: 1.5px dashed var(--accent-line); border-right: 1.5px dashed var(--accent-line);
+  transform: translateY(-50%) rotate(45deg);
+}
+/* 枠だけの大きな箱（矢じりなし） */
+.rm-bar[data-tone="open"] {
+  background: var(--line-2); font-size: 15px; font-weight: 700;
+  clip-path: none; margin-right: 3px;
+}
+.rm-bar[data-tone="open"]::before { clip-path: none; }
+
+/* マイルストンから下ろす破線 */
+.rm-vline { grid-column: var(--a) / span 1; justify-self: center; width: 0; align-self: stretch;
+  border-left: 1px dashed var(--line-2); }
+.rm-note { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+/* embed: 既存の可視化アプリ（自己完結HTML）をそのまま載せる枠 */
+[data-block="embed"] { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+[data-block="embed"] figure { display: flex; flex-direction: column; height: 100%; min-height: 0; margin: 0; }
+.embed {
+  position: relative; flex: 1 1 auto; width: 100%; min-height: 200px; overflow: hidden;
+  border: 1px solid var(--line-2); border-radius: var(--r-s); background: var(--surface);
+}
+.embed > iframe { position: absolute; top: 0; left: 0; border: 0; display: block; transform-origin: top left; background: transparent; }
+.embed-hint {
+  position: absolute; right: 10px; bottom: 8px; font-size: 11.5px; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; pointer-events: none;
+}
+
+/* quote */
+[data-block="quote"] blockquote {
+  margin: 0; font-size: 22px; line-height: 1.66; color: var(--ink-2);
+  border-left: 3px solid var(--accent); padding-left: 22px;
+}
+[data-block="quote"] .src { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+/* spacer */
+[data-block="spacer"] { height: 20px; }
+[data-block="spacer"][data-size="l"] { height: 44px; }
+[data-block="spacer"][data-size="s"] { height: 10px; }
+
+/* 密度 */
+.slide[data-density="tight"] { font-size: calc(var(--fs) * .9); }
+.slide[data-density="tight"] [data-block] { margin-bottom: 13px; }
+.slide[data-density="tight"] .note, .slide[data-density="tight"] .warnbox,
+.slide[data-density="tight"] .keybox { font-size: 16px; padding: 13px 16px; }
+.slide[data-density="tight"] table { font-size: 15.5px; }
+.slide[data-density="tight"] th, .slide[data-density="tight"] td { padding: 7px 11px; }
+
+/* トースト：閲覧専用HTMLでも使うのでコア側に置く */
+.dm-toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(12px);
+  background: var(--ink); color: var(--bg); font-size: 13px; padding: 9px 16px;
+  border-radius: 8px; z-index: 90; opacity: 0; pointer-events: none; transition: .18s;
+  font-family: var(--font-ja);
+}
+.dm-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* 生成物である警告バッジは既定で非表示（表示するのはエディタCSS側） */
+.dm-overbadge { display: none; }
+
+/* ============================================================
+   4.5 マスターごとの造作
+   ============================================================ */
+
+/* 章タブ（シェブロン）。スライドの先頭に置く。全マスターで使える */
+.s-tabs { display: flex; gap: 4px; margin: 0 0 20px; flex: none; }
+.s-tabs i {
+  font-style: normal; font-size: 14.5px; font-weight: 700; line-height: 1;
+  color: var(--muted); background: var(--accent-soft); white-space: nowrap;
+  padding: 9px 32px 9px 20px;
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%);
+}
+.s-tabs i.on { background: var(--accent); color: var(--surface); }
+.slide[data-layout="cover"] .s-tabs,
+.slide[data-layout="section"] .s-tabs,
+.slide[data-layout="statement"] .s-tabs { display: none; }
+/* タブがあるときは走りラベルを出さない（属性は読み込み時にJSが立てる。
+   親要素セレクタを使わず、古いブラウザでも閲覧側が崩れないようにしている） */
+.slide[data-tabs][data-chapter]::before { content: none; }
+
+/* ロゴ枠。右上に置く。中身は各自で入れる */
+.s-logo {
+  position: absolute; top: 12px; right: 92px; height: 38px;
+  display: flex; align-items: center; gap: 12px; z-index: 2;
+}
+.s-logo img { height: 100%; width: auto; display: block; }
+.s-logo:empty::before {
+  content: "ロゴ"; font-size: 11px; color: var(--muted);
+  border: 1px dashed var(--line-2); border-radius: 3px; padding: 0 14px; line-height: 36px;
+}
+.slide[data-layout="section"] .s-logo, .slide[data-layout="statement"] .s-logo { display: none; }
+
+/* ---------------- jtc ---------------- */
+/* 全体をひとまわり詰める。1枚に載る情報量を増やすためのマスター */
+:root[data-master="jtc"] .s-title { font-size: 28px; gap: 10px; }
+:root[data-master="jtc"] .s-title .n {
+  background: var(--accent); color: #fff; border-color: var(--accent); font-size: 12px; padding: 2px 8px;
+}
+:root[data-master="jtc"] .slide[data-chapter]:not([data-chapter=""])::before { top: 12px; font-size: 11px; }
+:root[data-master="jtc"] .s-rule { margin: 8px 0 12px; }
+:root[data-master="jtc"] [data-block] { margin-bottom: 8px; }
+:root[data-master="jtc"] .s-cols { gap: 12px; }
+:root[data-master="jtc"] [data-block="heading"] h3 { font-size: 19px; }
+:root[data-master="jtc"] [data-block="heading"] h3::before { width: 3px; margin-right: 8px; }
+:root[data-master="jtc"] [data-block="text"] p { margin-bottom: 8px; max-width: none; }
+:root[data-master="jtc"] [data-block="list"] li { margin-bottom: 5px; }
+:root[data-master="jtc"] [data-block="list"] ul, :root[data-master="jtc"] [data-block="list"] ol { max-width: none; }
+:root[data-master="jtc"] .note,
+:root[data-master="jtc"] .warnbox,
+:root[data-master="jtc"] .keybox { font-size: 17px; padding: 9px 12px; line-height: 1.58; }
+:root[data-master="jtc"] .note .lbl,
+:root[data-master="jtc"] .warnbox .lbl,
+:root[data-master="jtc"] .keybox .lbl { font-size: 12.5px; margin-bottom: 3px; }
+:root[data-master="jtc"] .note p, :root[data-master="jtc"] .warnbox p, :root[data-master="jtc"] .keybox p { margin-bottom: 6px; }
+:root[data-master="jtc"] table { font-size: 16.5px; }
+:root[data-master="jtc"] th, :root[data-master="jtc"] td { padding: 5px 9px; line-height: 1.42; }
+:root[data-master="jtc"] thead th { background: var(--accent); color: #fff; font-size: 13.5px; }
+:root[data-master="jtc"] .tw,
+:root[data-master="jtc"] .card,
+:root[data-master="jtc"] .kpi,
+:root[data-master="jtc"] .step,
+:root[data-master="jtc"] .fl-node,
+:root[data-master="jtc"] .st-row,
+:root[data-master="jtc"] .ch-cell,
+:root[data-master="jtc"] .figbox,
+:root[data-master="jtc"] .keybox { border-color: var(--line-2); }
+:root[data-master="jtc"] .step { padding: 9px 12px; grid-template-columns: 58px 1fr; gap: 11px; }
+:root[data-master="jtc"] .step h4 { font-size: 17px; }
+:root[data-master="jtc"] .step p { font-size: 15.5px; line-height: 1.48; }
+:root[data-master="jtc"] .step .sn { font-size: 12.5px; padding: 2px 0; }
+:root[data-master="jtc"] .steps { gap: 5px; }
+:root[data-master="jtc"] .card { padding: 11px 13px; }
+:root[data-master="jtc"] .card .pt { font-size: 17px; margin: 2px 0 4px; }
+:root[data-master="jtc"] .card .pd { font-size: 15px; line-height: 1.52; }
+:root[data-master="jtc"] .card .pn { font-size: 12.5px; }
+:root[data-master="jtc"] .cards, :root[data-master="jtc"] .kpis { gap: 7px; }
+:root[data-master="jtc"] .kpi { padding: 10px 13px; }
+:root[data-master="jtc"] .kpi .kv { font-size: 36px; margin: 2px 0 1px; }
+:root[data-master="jtc"] .kpi .kl { font-size: 13px; }
+:root[data-master="jtc"] .kpi .kn { font-size: 13.5px; }
+:root[data-master="jtc"] .qa { padding-left: 13px; margin-bottom: 9px; }
+:root[data-master="jtc"] .qa .q { font-size: 17px; }
+:root[data-master="jtc"] .qa .a { font-size: 15.5px; line-height: 1.52; }
+:root[data-master="jtc"] figcaption { font-size: 14px; margin-top: 6px; }
+:root[data-master="jtc"] .figbox { padding: 12px; }
+:root[data-master="jtc"] .bar .bl, :root[data-master="jtc"] .bar .bv { font-size: 15.5px; }
+:root[data-master="jtc"] .bars { gap: 7px; }
+:root[data-master="jtc"] .st-row { padding: 9px 13px; }
+:root[data-master="jtc"] .st-row .st-b { font-size: 17px; }
+:root[data-master="jtc"] .st-row .st-b small { font-size: 14.5px; }
+:root[data-master="jtc"] .st-row .st-n { font-size: 14px; }
+:root[data-master="jtc"] .slide[data-layout="section"],
+:root[data-master="jtc"] .slide[data-layout="statement"] {
+  background: #1f4e79; color: #fff;
+  --ink: #fff; --ink-2: rgba(255,255,255,.9); --muted: rgba(255,255,255,.75);
+  --accent: #bcd6ee; --accent-line: rgba(255,255,255,.38); --accent-soft: rgba(255,255,255,.12);
+  --line: rgba(255,255,255,.28); --line-2: rgba(255,255,255,.42); --title-c: #fff;
+}
+
+/* メッセージライン：そのスライドの主張を1行で。タイトル直下に置く */
+.s-msg {
+  flex: none; background: none; border: 0; border-bottom: 1px solid var(--line-2);
+  border-radius: 0; padding: 0 0 7px; margin: 0 0 12px;
+  font-size: calc(var(--fs) * 1.04); font-weight: 700; line-height: 1.55; color: var(--ink);
+}
+:root[data-master="mono"] .s-msg { border-bottom-color: var(--ink); }
+
+/* 脚注：版面の下端に寄せる */
+.s-note {
+  flex: none; margin-top: auto; padding-top: 7px; border-top: 1px solid var(--line);
+  font-size: calc(var(--fs) * .76); color: var(--muted); line-height: 1.5;
+}
+.s-note b { font-weight: 700; color: var(--ink-2); }
+
+/* ---------------- mono ---------------- */
+:root[data-master="mono"] .s-title { letter-spacing: -.02em; }
+:root[data-master="mono"] .s-title .n {
+  background: none; border: 1.5px solid var(--ink); color: var(--ink); font-size: 13px;
+}
+:root[data-master="mono"] .s-rule { height: 2px; background: var(--ink); }
+:root[data-master="mono"] thead th {
+  background: none; color: var(--ink); border-bottom: 1.5px solid var(--ink);
+}
+:root[data-master="mono"] .tw { border-color: var(--line-2); }
+:root[data-master="mono"] [data-block="heading"] h3::before { background: var(--alarm); }
+/* mono では要点の見出しだけ朱を当てて識別する */
+:root[data-master="mono"] .keybox .lbl { color: var(--alarm); }
+/* モノクロ原則を保つため、重点バーも無彩色にする */
+:root[data-master="mono"] .rm { --rm-hi: #e7e7e3; --rm-hi-line: #6f6f6a; }
+:root[data-master="mono"] .s-tabs i {
+  clip-path: none; background: none; border: 1px solid var(--line-2); padding: 8px 16px;
+}
+:root[data-master="mono"] .s-tabs i.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+:root[data-master="mono"] .slide[data-layout="section"],
+:root[data-master="mono"] .slide[data-layout="statement"] {
+  background: #141412; color: #fbfbf9;
+  --ink: #fbfbf9; --ink-2: #d8d7d2; --muted: #a3a29b;
+  --accent: #fbfbf9; --accent-line: rgba(251,251,249,.35); --accent-soft: rgba(251,251,249,.12);
+  --alarm: #ff7f70; --line: rgba(251,251,249,.25); --line-2: rgba(251,251,249,.38);
+  --title-c: #fbfbf9;
+}
+:root[data-master="mono"] .slide[data-layout="statement"] .s-title { font-weight: 700; }
+:root[data-master="mono"] .slide[data-layout="cover"] .s-kicker { color: var(--alarm); }
+:root[data-master="mono"] .slide[data-layout="cover"] .s-title { font-size: 58px; }
+
+/* ============================================================
+   5. 印刷 / PDF（PowerPoint 16:9 と同寸: 13.333in × 7.5in）
+   ============================================================ */
+@page { size: 13.333in 7.5in; margin: 0; }
+@media print {
+  html, body { height: auto; overflow: visible; background: #fff; }
+  :root { --shadow: none; --shadow-lift: none; }
+  .dm-topbar, .dm-rail, .dm-ui, .dm-hint { display: none !important; }
+  .dm-app { display: block; height: auto; }
+  .dm-stage { display: block; overflow: visible; padding: 0; background: #fff; }
+  .dm-deck { display: block !important; }
+  .dm-holder {
+    display: block !important; width: var(--slide-w) !important; height: var(--slide-h) !important;
+    break-after: page; page-break-after: always; overflow: hidden;
+  }
+  .dm-holder:last-child { break-after: auto; page-break-after: auto; }
+  .slide {
+    transform: none !important; box-shadow: none !important; border-radius: 0 !important;
+    break-inside: avoid; page-break-inside: avoid;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  [contenteditable] { outline: none !important; }
+}
+
+/* ============================================================
+   閲覧レイアウト(doc) — 受領者が上から下へ読むための並べ方。
+   スライドを縦に積み、幅に合わせて縮める。ページ送りの UI は持たない。
+   印刷は @media print 側の指定に任せるので、画面表示にだけ効かせる。
+   ============================================================ */
+@media screen {
+  body[data-mode="doc"] .dm-stage {
+    place-items: start center; align-content: start; gap: 24px; padding: 24px;
+  }
+  body[data-mode="doc"] .dm-holder { display: block; }
+}
+</style>
+</head>
+<body data-mode="doc">
+
+<div class="dm-app"><div class="dm-stage" id="dmStage">
+
+<div class="dm-deck" id="dmDeck">
+<!-- 01 表紙 -->
+<section class="slide" data-layout="cover">
+  <div class="s-kicker">フォーマット見本 ／ html-doc-maker</div>
+  <h1 class="s-title">HTMLスライド<br>標準フォーマット</h1>
+  <p class="s-lead">このファイルは、使えるレイアウトとブロックをひととおり並べた見本です。書き方に迷ったらここを開いて、近いスライドのHTMLをコピーしてください。</p>
+  <div class="s-meta">
+    <span><b>レイアウト</b> 8種</span>
+    <span><b>ブロック</b> 19種</span>
+    <span><b>マスター</b> 3種</span>
+  </div>
+</section>
+
+<!-- 02 目次 -->
+<section class="slide" data-layout="agenda" data-chapter="目次">
+  <h2 class="s-title">レイアウトは8種類</h2>
+  <div class="s-rule"></div>
+  <div class="s-main">
+    <ol class="s-agenda">
+      <li><span class="num">01</span><span><code>cover</code> 表紙</span><span class="sub">キッカー／大見出し／リード</span></li>
+      <li><span class="num">05</span><span><code>split</code> 2カラム</span><span class="sub">左に論、右に図表</span></li>
+      <li><span class="num">02</span><span><code>agenda</code> 目次</span><span class="sub">番号つき2カラム</span></li>
+      <li><span class="num">06</span><span><code>visual</code> 図表全面</span><span class="sub">図を最大化する</span></li>
+      <li><span class="num">03</span><span><code>section</code> 章扉</span><span class="sub">部・章の切り替え</span></li>
+      <li><span class="num">07</span><span><code>statement</code> 主張1枚</span><span class="sub">大きな一文で転換</span></li>
+      <li><span class="num">04</span><span><code>body</code> 標準</span><span class="sub">タイトル＋ブロック</span></li>
+      <li><span class="num">08</span><span><code>closing</code> 締め</span><span class="sub">次のアクション</span></li>
+    </ol>
+    <div data-block="note">
+      <div class="note">
+        <span class="lbl">切り替え方</span>
+        <p><code>&lt;section class="slide" data-layout="body"&gt;</code> の <code>data-layout</code> を変えるだけです。編集モードなら「レイアウト」ボタンからも選べます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 章扉 -->
+<section class="slide" data-layout="section" data-chapter="第1部">
+  <div class="s-bignum">第 1 部</div>
+  <h2 class="s-title">文章まわりのブロック</h2>
+  <p class="s-lead">段落、箇条書き、3種類のコールアウト。<br>まずはこの4つで大半のスライドが組めます。</p>
+  <div class="s-rule"></div>
+</section>
+
+<!-- 04 基本ブロック -->
+<section class="slide" data-layout="body" data-chapter="01 基本のブロック">
+  <h2 class="s-title"><span class="n">01</span>段落・箇条書き・コールアウト</h2>
+  <div class="s-rule"></div>
+  <div class="s-msg" data-block="msg">この行は<strong>メッセージライン</strong>（<code>.s-msg</code>）です。そのスライドで言いたいことを1行で置きます。箱にはせず、太字と下罫だけで示します。</div>
+  <div class="s-main">
+    <div class="s-cols" style="--split: 1fr 1fr;">
+      <div class="s-col">
+        <div data-block="heading"><h3>小見出しと段落</h3></div>
+        <div data-block="text">
+          <p>段落は <code>data-block="text"</code> の中に <code>&lt;p&gt;</code> を並べます。<strong>強調</strong>、<span class="ok">良好</span>、<span class="mid">要検討</span>、<span class="ng">未達</span> の4つを、文中の装飾として使えます。色は<strong>青に集約</strong>し、はっきり否定・警告したいときだけ<span class="ng">赤</span>を使います。</p>
+        </div>
+        <div data-block="list">
+          <ul>
+            <li>箇条書きは <code>data-block="list"</code> に <code>&lt;ul&gt;</code></li>
+            <li>番号つきにしたいときは <code>&lt;ol&gt;</code> に替えます</li>
+            <li>入れ子にはせず、1階層で収めるのが読みやすい</li>
+          </ul>
+        </div>
+      </div>
+      <div class="s-col">
+        <div data-block="note">
+          <div class="note">
+            <span class="lbl">補足ボックス note</span>
+            <p>前提や補足を添えるときに使います。見出しはアクセント色。</p>
+          </div>
+        </div>
+        <div data-block="warn">
+          <div class="warnbox">
+            <span class="lbl">注意ボックス warn</span>
+            <p>リスクや但し書きに使います。見出しは落ち着いた青。</p>
+          </div>
+        </div>
+        <div data-block="key">
+          <div class="keybox">
+            <span class="lbl">要点ボックス key</span>
+            <p>結論やまとめに使います。見出しは黒。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="s-note">この行は<b>脚注</b>（<code>.s-note</code>）です。<code>margin-top: auto</code> で版面の下端に寄るので、出典や但し書きを本文から追い出せます。</div>
+</section>
+
+<!-- 05 表とカードと数値 -->
+<section class="slide" data-layout="body" data-chapter="02 数字を見せる">
+  <h2 class="s-title"><span class="n">02</span>表・カード・数値の強調</h2>
+  <div class="s-rule"></div>
+  <div class="s-main">
+    <div data-block="kpi">
+      <div class="kpis" style="--n: 3;">
+        <div class="kpi"><div class="kl">指標その1</div><div class="kv">1,240<span class="u">件／月</span></div><div class="kn">補足をここに書きます</div></div>
+        <div class="kpi" data-tone="warn"><div class="kl">指標その2</div><div class="kv">38<span class="u">%</span></div><div class="kn">data-tone="warn" で青系</div></div>
+        <div class="kpi" data-tone="plain"><div class="kl">指標その3</div><div class="kv">4.2<span class="u">日</span></div><div class="kn">data-tone="plain" で黒</div></div>
+      </div>
+    </div>
+    <div class="s-cols" style="--split: 1.3fr 1fr;">
+      <div class="s-col">
+        <div data-block="table">
+          <div class="tw">
+            <table class="compact">
+              <thead><tr><th>区分</th><th>内容</th><th class="num-cell">数値</th><th>評価</th></tr></thead>
+              <tbody>
+                <tr><td>項目A</td><td>説明が入ります</td><td class="num-cell">1,600</td><td class="ok">良</td></tr>
+                <tr><td>項目B</td><td>説明が入ります</td><td class="num-cell">840</td><td class="mid">要検討</td></tr>
+                <tr><td>項目C</td><td>説明が入ります</td><td class="num-cell">120</td><td class="ng">未達</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div data-block="text">
+          <p style="font-size:15px;color:var(--muted)">数値の列には <code>class="num-cell"</code> を付けます。等幅・右寄せ・折返し禁止になります。行を詰めたいときは <code>&lt;table class="compact"&gt;</code>。</p>
+        </div>
+      </div>
+      <div class="s-col">
+        <div data-block="cards">
+          <div class="cards" style="--n: 1;">
+            <div class="card"><div class="pn">カード</div><div class="pt">見出しが入ります</div><div class="pd">説明文。<code>--n</code> で横に並べる数を決めます。3つ並べるなら <code>style="--n: 3"</code>。</div></div>
+            <div class="card"><div class="pn">カード</div><div class="pt">見出しが入ります</div><div class="pd">並列の選択肢や、3つの観点を見せるときに向いています。</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 図版プリミティブ -->
+<section class="slide" data-layout="body" data-chapter="03 図で見せる">
+  <h2 class="s-title"><span class="n">03</span>図はまずこの4つで組めないか考える</h2>
+  <div class="s-rule"></div>
+  <div class="s-main">
+    <div data-block="flow">
+      <div class="flow">
+        <div class="fl-node"><b>工程A</b><span>flow：横に並ぶ工程と矢印</span></div>
+        <div class="fl-arrow" style="--aw: 92px;"><i>受け渡すもの</i>
+          <svg viewBox="0 0 92 11" aria-hidden="true"><line x1="6" y1="5.5" x2="80" y2="5.5"></line><path d="M80 1.5 L89 5.5 L80 9.5 Z"></path></svg><i></i></div>
+        <div class="fl-node" data-tone="accent"><b>工程B</b><span>data-tone="accent" で強調</span></div>
+        <div class="fl-arrow" style="--aw: 92px;"><i>受け渡すもの</i>
+          <svg viewBox="0 0 92 11" aria-hidden="true"><line x1="6" y1="5.5" x2="80" y2="5.5"></line><path d="M80 1.5 L89 5.5 L80 9.5 Z"></path></svg><i></i></div>
+        <div class="fl-node" data-tone="mute"><b>工程C</b><span>data-tone="mute" で沈める</span></div>
+      </div>
+    </div>
+    <div class="s-cols" style="--split: 1fr 1fr;">
+      <div class="s-col">
+        <div data-block="bars">
+          <div class="bars" style="--lw: 118px; --vw: 92px;">
+            <div class="bar"><span class="bl">bars：比較</span><span class="bt" style="--w: 30%"></span><span class="bv">30</span></div>
+            <div class="bar" data-tone="warn"><span class="bl">周期や規模を</span><span class="bt" style="--w: 62%"></span><span class="bv">62</span></div>
+            <div class="bar" data-tone="alarm"><span class="bl">横棒で並べる</span><span class="bt" style="--w: 95%"></span><span class="bv">95</span></div>
+          </div>
+        </div>
+        <div data-block="chain">
+          <div class="chain">
+            <div class="ch-cell"><b>1日目</b><span>chain</span><i>前 → 次</i></div>
+            <div class="ch-link"></div>
+            <div class="ch-cell"><b>2日目</b><span>鎖</span><i>前 → 次</i></div>
+            <div class="ch-link"></div>
+            <div class="ch-cell" data-tone="accent"><b>3日目</b><span>到達</span><i>ここで完了</i></div>
+          </div>
+          <div class="ch-lab">前の終わりが次の始まりになる関係。</div>
+        </div>
+      </div>
+      <div class="s-col">
+        <div data-block="stack">
+          <div class="stack">
+            <div class="st-row" data-tone="mute" style="--kw: 88px; --nw: 128px;">
+              <div class="st-k">層1</div><div class="st-b">所与のもの<small>stack：層の積み重ね</small></div><div class="st-n">所与</div>
+            </div>
+            <div class="st-row" data-tone="mute" style="--kw: 88px; --nw: 128px;">
+              <div class="st-k">層2</div><div class="st-b">これも所与<small>上から順に積む</small></div><div class="st-n">所与</div>
+            </div>
+            <div class="st-row" data-tone="accent" style="--kw: 88px; --nw: 128px;">
+              <div class="st-k">層3</div><div class="st-b">ここだけ決める<small>決定できる層を際立たせる</small></div><div class="st-n">ここを決める</div>
+            </div>
+          </div>
+        </div>
+        <div data-block="qa">
+          <div class="qa"><div class="q">Q. これ以外の図は</div><p class="a">折れ線や曲線が要るときだけ <code>figure</code> にインラインSVGを書きます。既存の可視化アプリは <code>embed</code> で載せられます。</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 図表全面 -->
+<section class="slide" data-layout="visual" data-chapter="03 図で見せる">
+  <h2 class="s-title"><span class="n">03</span>visual レイアウト — 図を最大化する</h2>
+  <div class="s-rule"></div>
+  <div class="s-main">
+    <div data-block="figure">
+      <figure>
+        <div class="figbox">
+          <svg viewBox="0 0 1000 300" width="1000" height="300" role="img" aria-label="折れ線グラフの見本">
+            <g style="stroke:var(--line);stroke-width:1">
+              <line x1="80" y1="50" x2="940" y2="50"></line><line x1="80" y1="120" x2="940" y2="120"></line>
+              <line x1="80" y1="190" x2="940" y2="190"></line><line x1="80" y1="260" x2="940" y2="260"></line>
+            </g>
+            <g style="font-size:13px;fill:var(--muted)" text-anchor="end">
+              <text x="70" y="54">100</text><text x="70" y="124">75</text><text x="70" y="194">50</text><text x="70" y="264">25</text>
+            </g>
+            <g style="font-size:13px;fill:var(--muted)" text-anchor="middle">
+              <text x="160" y="282">1月</text><text x="380" y="282">4月</text><text x="600" y="282">7月</text><text x="820" y="282">10月</text>
+            </g>
+            <path d="M160 240 L380 190 L600 120 L820 70" style="fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round"></path>
+            <g style="fill:var(--accent)"><circle cx="160" cy="240" r="5"></circle><circle cx="380" cy="190" r="5"></circle><circle cx="600" cy="120" r="5"></circle><circle cx="820" cy="70" r="5"></circle></g>
+            <g style="font-size:13.5px;fill:var(--accent);font-weight:700"><text x="820" y="52" text-anchor="middle">到達点</text></g>
+          </svg>
+        </div>
+        <figcaption>SVGは <code>viewBox</code> を持たせて <code>width</code> を 100% にすれば、版面に合わせて伸縮します。色は <code>style="fill:var(--accent)"</code> のようにCSS変数で指定すると、マスターやテーマを切り替えても追随します。</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 08 手順 -->
+<section class="slide" data-layout="split" data-chapter="04 進め方を見せる">
+  <h2 class="s-title"><span class="n">04</span>手順は steps、比較は表</h2>
+  <div class="s-rule"></div>
+  <div class="s-main">
+    <div class="s-cols" style="--split: 1.25fr 1fr;">
+      <div class="s-col">
+        <div data-block="steps">
+          <div class="steps">
+            <div class="step"><div class="sn">STEP 1</div><div><h4>最初にやること</h4><p>左のラベル（<code>.sn</code>）には番号でも日付でも入れられます。「〜20日」のような期間でも構いません。</p></div></div>
+            <div class="step"><div class="sn">STEP 2</div><div><h4>次にやること</h4><p>見出しと説明の2段構成です。説明は1〜2行に収めると読みやすくなります。</p></div></div>
+            <div class="step"><div class="sn">STEP 3</div><div><h4>最後にやること</h4><p>4〜5個を超えると版面に収まりにくくなります。多い場合はスライドを分けてください。</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="s-col">
+        <div data-block="table">
+          <div class="tw">
+            <table class="compact">
+              <thead><tr><th>方式</th><th>評価</th></tr></thead>
+              <tbody>
+                <tr><td>案1</td><td class="ok">向いている</td></tr>
+                <tr><td>案2</td><td class="mid">条件つき</td></tr>
+                <tr><td>案3</td><td class="ng">不可</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div data-block="key">
+          <div class="keybox">
+            <span class="lbl">2カラムの作り方</span>
+            <p><code>.s-cols</code> で囲み、中に <code>.s-col</code> を2つ置きます。配分は <code>style="--split: 1.25fr 1fr"</code> で調整します。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ロードマップ -->
+<section class="slide" data-layout="body" data-chapter="04 進め方を見せる" data-density="tight">
+  <h2 class="s-title"><span class="n">04</span>工程表 — 年度 × ワークストリーム</h2>
+  <div class="s-rule"></div>
+  <div class="s-main">
+    <div data-block="roadmap">
+      <div class="rm" style="--cols: 22; --lw: 76px;">
+
+        <div class="rm-row">
+          <div class="rm-lab"></div>
+          <div class="rm-track">
+            <div class="rm-y" style="--a:1; --b:9">2030</div>
+            <div class="rm-y" style="--a:9; --b:15">2031</div>
+            <div class="rm-y" style="--a:15; --b:19">2032</div>
+            <div class="rm-y" style="--a:19; --b:23">2033</div>
+          </div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-lab">マイルストン</div>
+          <div class="rm-track">
+            <div class="rm-m" style="--a:1; --w:3"><b>着手</b><i>2030.1</i></div>
+            <div class="rm-m" style="--a:6; --w:3"><b>PoC評価</b><i>2030.9</i></div>
+            <div class="rm-m" data-tone="key" style="--a:10; --w:3"><b>開発着手判断</b><i>2031.4</i></div>
+            <div class="rm-m" style="--a:14; --w:3"><b>初回リリース</b><i>2031.11</i></div>
+            <div class="rm-m" style="--a:20; --w:3"><b>全線展開</b><i>2033.10</i></div>
+          </div>
+        </div>
+
+        <div class="rm-sec">
+          <div class="rm-lab rm-lab--v">全体計画</div>
+          <div class="rm-sec-body">
+            <div class="rm-row"><div class="rm-track">
+              <div class="rm-bar" data-tone="hi" style="--a:1; --b:6"><span><b>①現行検査の実態把握</b></span></div>
+              <div class="rm-bar" style="--a:6; --b:10"><span><b>要件と精度目標の確定</b></span></div>
+              <div class="rm-bar" data-tone="plan" style="--a:10; --b:15"><span><b>展開計画の策定</b></span></div>
+              <div class="rm-bar" style="--a:15; --b:23"><span><b>対象線区への展開</b></span></div>
+            </div></div>
+            <div class="rm-row"><div class="rm-track">
+              <div class="rm-bar" data-tone="hi" style="--a:1; --b:7"><span><b>②投資効果の試算</b><i>検査工数・精度</i></span></div>
+              <div class="rm-bar" style="--a:7; --b:12"><span><b>投資判断・予算化</b></span></div>
+              <div class="rm-bar" style="--a:12; --b:23"><span><b>（計画）年度予算への反映</b></span></div>
+            </div></div>
+            <div class="rm-row"><div class="rm-track">
+              <div class="rm-bar" data-tone="hi" style="--a:1; --b:5"><span><b>③検査要領との整合</b></span></div>
+              <div class="rm-bar" style="--a:5; --b:10"><span><b>表記ルールの改訂案</b></span></div>
+              <div class="rm-bar" style="--a:10; --b:23"><span><b>関係箇所との協議</b></span></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="rm-sec">
+          <div class="rm-lab rm-lab--v">モデル開発</div>
+          <div class="rm-sec-body">
+            <div class="rm-sec">
+              <div class="rm-lab rm-lab--v">データ</div>
+              <div class="rm-sec-body">
+                <div class="rm-row"><div class="rm-track">
+                  <div class="rm-bar" style="--a:1; --b:7"><span><b>画像の収集と一次整理</b></span></div>
+                  <div class="rm-bar" style="--a:7; --b:14"><span><b>アノテーション</b><i>ひび割れ・漏水・剥離</i></span></div>
+                  <div class="rm-bar" data-tone="plan" style="--a:14; --b:21"><span><b>追加収集と再学習</b></span></div>
+                </div></div>
+              </div>
+            </div>
+            <div class="rm-sec">
+              <div class="rm-lab rm-lab--v">モデル</div>
+              <div class="rm-sec-body">
+                <div class="rm-row"><div class="rm-track">
+                  <div class="rm-bar" data-tone="hi" style="--a:1; --b:6"><span><b>PoC</b><i>検出精度の見極め</i></span></div>
+                  <div class="rm-bar" style="--a:6; --b:15"><span><b>検出モデルの開発・改良</b></span></div>
+                  <div class="rm-bar" data-tone="open" style="--a:15; --b:23"><span>★ 現場リリース（2032〜）</span></div>
+                </div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rm-sec">
+          <div class="rm-lab rm-lab--v">現場導入</div>
+          <div class="rm-sec-body">
+            <div class="rm-row"><div class="rm-track">
+              <div class="rm-bar" style="--a:1; --b:7"><span><b>撮影機材の選定</b></span></div>
+              <div class="rm-bar" data-tone="plan" style="--a:7; --b:18"><span><b>試行区間での運用検証</b></span></div>
+              <div class="rm-bar" data-tone="fill" style="--a:18; --b:23"><span><b>本格運用</b></span></div>
+            </div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="s-note"><b>書き方</b> 総列数を <code>--cols</code> で宣言し、各要素に <code>--a</code>（開始列）と <code>--b</code>（終了列）を書くだけです。年度の幅は重要度で変えます（この例では検討が集中する2030年を8列、2032年以降を4列）。塗りは <code>data-tone</code> で <code>hi</code>（重点）／既定（確定）／<code>plan</code>（未確定・破線）／<code>fill</code>（濃色）／<code>open</code>（矢じりなしの箱）から選びます。</div>
+</section>
+
+
+<!-- 10 締め -->
+<section class="slide" data-layout="body" data-chapter="05 仕上げ" data-density="tight">
+  <h2 class="s-title"><span class="n">05</span>書いたら、版面を確認する</h2>
+  <div class="s-rule"></div>
+  <div class="s-msg" data-block="msg">版面は 1280×720。<span class="ng">はみ出しても画面上は静かに切れる</span>ので、書き終えたら必ず確認してください。</div>
+  <div class="s-main">
+    <div class="s-cols" style="--split: 1fr 1fr;">
+      <div class="s-col">
+        <div data-block="heading"><h3>確認のしかた</h3></div>
+        <div data-block="list">
+          <ol>
+            <li>ブラウザで開いて<strong>「編集」</strong>を押す</li>
+            <li>はみ出したスライドは<span class="ng">赤枠</span>になり警告が出る</li>
+            <li>全マスター一括は <code>DMEditor.auditMasters()</code></li>
+          </ol>
+        </div>
+        <div data-block="warn">
+          <div class="warnbox">
+            <span class="lbl">収まらないときの順番</span>
+            <p>文章を締める → <code>data-density="tight"</code> を足す → それでも駄目なら<strong>分割する</strong>。文字を小さくして詰め込むのは最後の手段です。</p>
+          </div>
+        </div>
+      </div>
+      <div class="s-col">
+        <div data-block="heading"><h3>マスターを選ぶ</h3></div>
+        <div data-block="table">
+          <div class="tw">
+            <table class="compact">
+              <thead><tr><th>マスター</th><th>用途</th></tr></thead>
+              <tbody>
+                <tr><td><code>report</code></td><td>検討資料（既定）</td></tr>
+                <tr><td><code>jtc</code></td><td>1枚に詰めたいとき</td></tr>
+                <tr><td><code>mono</code></td><td>投影・白黒印刷</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div data-block="key">
+          <div class="keybox">
+            <span class="lbl">配るとき</span>
+            <p>「書き出し」→ <strong>自己完結HTML（閲覧専用）</strong>。編集UIが外れて軽くなり、誤編集もありません。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="s-note">詳しい仕様は <code>docs/FORMAT.md</code> にあります。</div>
+</section>
+</div><!-- /.dm-deck -->
+
+</div></div>
+
+<script id="deck-layout">
+/* ============================================================
+   束ね層 — スライドを並べ、番号を振り、画面幅に合わせて縮める。
+   編集機能・ページ送り・発表モードは持たない(slide-editor の担当)。
+   ============================================================ */
+(function () {
+  var SW = 1280, SH = 720;
+  var deck = document.getElementById('dmDeck');
+  var stage = document.getElementById('dmStage');
+  if (!deck || !stage) return;
+
+  function holders() { return [].slice.call(deck.querySelectorAll(':scope > .dm-holder')); }
+  function slides() { return [].slice.call(deck.querySelectorAll(':scope > .dm-holder > .slide')); }
+
+  /* 素の <section class="slide"> を holder で包む。holder が版面の場所取りをする */
+  function mount() {
+    [].slice.call(deck.children).forEach(function (el) {
+      if (el.classList.contains('dm-holder')) return;
+      if (!el.classList.contains('slide')) return;
+      var h = document.createElement('div');
+      h.className = 'dm-holder';
+      deck.insertBefore(h, el);
+      h.appendChild(el);
+    });
+    slides().forEach(function (s) { if (s.querySelector('.s-tabs')) s.dataset.tabs = '1'; });
+    renumber();
+    requestAnimationFrame(fitEmbeds);
+  }
+
+  /* ページ番号。表紙と主張スライドには振らない */
+  function renumber() {
+    var list = slides(), n = 0;
+    var total = list.filter(function (s) {
+      var l = s.dataset.layout;
+      return l !== 'cover' && l !== 'statement';
+    }).length;
+    list.forEach(function (s) {
+      var l = s.dataset.layout;
+      if (l === 'cover' || l === 'statement') { s.removeAttribute('data-page'); return; }
+      n += 1;
+      s.setAttribute('data-page', n + ' / ' + total);
+    });
+  }
+
+  /* 埋め込みアプリを枠の中に収める(中の JS には触らない) */
+  function fitEmbed(box) {
+    var frame = box.querySelector('iframe');
+    if (!frame) return;
+    var ew = parseFloat(box.dataset.ew || '1220');
+    var eh = parseFloat(box.dataset.eh || '0');
+    var w = box.clientWidth, h = box.clientHeight;
+    if (!w || !h) return;
+    frame.style.width = ew + 'px';
+    frame.style.height = (eh || Math.round(h * (ew / w))) + 'px';
+    frame.style.transform = 'scale(' + (w / ew).toFixed(4) + ')';
+    frame.style.transformOrigin = 'top left';
+  }
+  function fitEmbeds() { [].slice.call(document.querySelectorAll('.embed')).forEach(fitEmbed); }
+
+  /* 版面を画面幅に合わせて縮める。原寸より拡大はしない */
+  function fit() {
+    var r = stage.getBoundingClientRect();
+    var s = Math.min((r.width - 48) / SW, 1);
+    stage.style.setProperty('--s', Math.max(0.1, s).toFixed(4));
+  }
+
+  /* 印刷は必ずライトテーマで出す */
+  var printTheme = null;
+  window.addEventListener('beforeprint', function () {
+    printTheme = document.documentElement.dataset.theme || 'auto';
+    document.documentElement.dataset.theme = 'light';
+  });
+  window.addEventListener('afterprint', function () {
+    if (printTheme !== null) document.documentElement.dataset.theme = printTheme;
+    printTheme = null;
+  });
+
+  window.addEventListener('resize', function () { fit(); requestAnimationFrame(fitEmbeds); });
+
+  mount();
+  fit();
+
+  /* slide-editor が取り込むときに使う */
+  window.DeckLayout = { mount: mount, renumber: renumber, fit: fit, fitEmbeds: fitEmbeds,
+                        holders: holders, slides: slides, SW: SW, SH: SH };
+})();
+</script>
+</body>
+</html>
