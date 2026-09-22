@@ -1,5 +1,5 @@
 name: agent-kit
-version: 1.0.0
+version: 1.0.1
 description: 自作スキル・ルールと採用した市中スキルの束。プロジェクトは apm.yml でこのパッケージを 1 行指定して apm install する
 author: koro298
 dependencies:
