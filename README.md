@@ -7,6 +7,7 @@ Claude Code と Codex に配る自作スキル・自作ルール・採用した�
 | 品目 | 種別 | 実体 |
 |---|---|---|
 | desk-loop | 自作スキル | `.apm/skills/desk-loop/` |
+| impl-loop | 自作スキル | `.apm/skills/impl-loop/` |
 | smart-commit | 自作スキル | `.apm/skills/smart-commit/` |
 | slide-deck(スライド作成) | 自作スキル | `.apm/skills/slide-deck/` |
 | slide-editor(スライド編集・発表) | 自作スキル | `.apm/skills/slide-editor/` |
