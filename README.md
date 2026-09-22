@@ -24,12 +24,31 @@ Claude Code と Codex に配る自作スキル・自作ルール・採用した�
 | スキル | `.claude/skills/<name>/` | `.agents/skills/<name>/` |
 | ルール | `.claude/rules/<name>.md` | `AGENTS.md`(`apm compile` で生成) |
 
-- A. ホストの初期化(1 回)。apm、crit と両ツールのプラグイン、draw.io Desktop(Linux は xvfb も)を入れる。`host.sh` は自己完結しているので取得方法は問わない。例として clone して実行する。非公開のまま運用する場合は、先に GitHub の認証(`gh auth login` か SSH 鍵、または credential helper)を済ませる。手順 B の `apm install` も同じ認証を使う。
+- A. ホストの初期化(1 回)。apm、crit と両ツールのプラグイン、draw.io Desktop(Linux は xvfb も)を入れる。スクリプトは自己完結しているので取得方法は問わない。例として clone して実行する。非公開のまま運用する場合は、先に GitHub の認証(`gh auth login` か SSH 鍵、または credential helper)を済ませる。手順 B の `apm install` も同じ認証を使う。
+
+  - macOS / Linux
 
 ```bash
 git clone https://github.com/koro298/agent-kit.git ~/Workspace/agent-kit
 bash ~/Workspace/agent-kit/bootstrap/host.sh
 ```
+
+  - Windows(PowerShell 7 以降。draw.io の導通確認に winget とデスクトップセッションが要る)
+
+```powershell
+git clone https://github.com/koro298/agent-kit.git $HOME\Workspace\agent-kit
+pwsh -File $HOME\Workspace\agent-kit\bootstrap\host.ps1
+```
+
+  - `host.ps1` は `host.sh` と同じものを Windows の手段で入れる。相違は次の4点。
+
+| 品目 | host.sh(macOS / Linux) | host.ps1(Windows) |
+|---|---|---|
+| apm の更新 | pipx / brew / インストーラを導入経路で使い分け | 同じく使い分け。標準導入では `apm self-update` が staged した exe の実行確認で落ちるため、インストーラを直接叩く |
+| crit | brew、または Go でビルド | 公式リリースの単体バイナリを `~/.local/bin` へ |
+| draw.io | brew cask / apt。Linux はヘッドレス用に xvfb も | winget の `JGraph.Draw`。xvfb は不要 |
+| `drawio` コマンド | 実体へのシンボリックリンク | `~/.local/bin` のシム。実体が GUI アプリで終了を待たないため `start /wait` 越しに呼ぶ |
+
 
 - B. プロジェクトへの導入。プロジェクト直下に `apm.yml` を次の内容で作り(`<project>` を書き換える)、install する。
 

@@ -11,4 +11,5 @@ description: 作図(draw.io / Excalidraw)を行うときの生成物の形式と
   - Mermaid で書いた場合: `drawio -x -f xml -o <name>.drawio <name>.mmd` で先に `.drawio` へ変換する。`.mmd` から直接 `-e` 付きで画像に書き出さない。
   - `.drawio` から `drawio -x -f svg -e -b 10 -o <name>.drawio.svg <name>.drawio` で書き出す。
 - Linux で環境変数 `DISPLAY` が無い(ヘッドレス)ときは、`drawio` の各呼び出しを `xvfb-run -a` で包む。例: `xvfb-run -a drawio -x -f svg -e -b 10 -o out.drawio.svg in.drawio`。
+- Windows では `drawio` が GUI アプリを包むシムで、標準出力も終了メッセージも返さない。成否はコマンドの出力ではなく、書き出し先ファイルができたかで判定する。
 - 配色・粒度・命名などの作図規約は本書では定めない。
