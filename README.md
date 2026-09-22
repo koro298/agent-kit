@@ -14,6 +14,7 @@ Claude Code と Codex に配る自作スキル・自作ルール・採用した�
 | doc-style | 自作ルール(全ファイル) | `.apm/instructions/doc-style.instructions.md` |
 | python-coding | 自作ルール(`**/*.py`、`pyproject.toml`) | `.apm/instructions/python-coding.instructions.md` |
 | diagramming | 自作ルール(作図ファイル) | `.apm/instructions/diagramming.instructions.md` |
+| vuetify | 自作ルール(`**/*.vue` ほか Vue プロジェクトの構成ファイル) | `.apm/instructions/vuetify.instructions.md` |
 | drawio | 市中スキル | `apm.yml` の依存(jgraph/drawio-mcp、SHA ピン) |
 | excalidraw-diagram-generator | 市中スキル | `apm.yml` の依存(github/awesome-copilot、SHA ピン) |
 | skill-creator | 市中スキル | `apm.yml` の依存(anthropics/skills、SHA ピン) |
