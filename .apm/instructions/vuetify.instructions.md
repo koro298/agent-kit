@@ -19,7 +19,8 @@ One library per concern. Do not add a second one — another state manager, anot
 |---|---|
 | Scaffold | `npm create vuetify` |
 | Build | Vite with `vite-plugin-vuetify` (treeshaking, `styles.configFile`) |
-| Routing | `unplugin-vue-router` over `src/pages/`, with `vite-plugin-vue-layouts-next` |
+| Routing | Vue Router 5's built-in file-based routing (`vue-router/vite`) over `src/pages/`. On Vue Router 4, the same thing through `unplugin-vue-router` |
+| Layouts | `vite-plugin-vue-layouts-next`. Layouts stayed a plugin when file-based routing moved into Vue Router |
 | State | Pinia |
 | Charts | `vue-chartjs` on Chart.js 4 |
 | Icons | `@mdi/font` |
@@ -65,7 +66,8 @@ The scaffold's directories are the contract. Do not create new top-level directo
 
 ## Routing
 
-- Routes come from the file tree under `src/pages/`; do not hand-maintain a route table. Layouts are applied through `setupLayouts`.
+- Routes come from the file tree under `src/pages/`; do not hand-maintain a route table.
+- Every route renders inside a layout. Wrap the generated routes once — `routes: setupLayouts(routes)` — and put the application shell in `src/layouts/default.vue`. A page that needs a different shell names its own layout rather than building one inline.
 - Navigation guards live in `src/router/`. A guard that needs store state calls the store inside the guard body — a store created at module scope runs before Pinia is installed.
 - Route params arrive as strings. Validate and convert them at the page boundary.
 
