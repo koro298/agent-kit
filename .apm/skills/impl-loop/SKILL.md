@@ -1,8 +1,7 @@
 ---
 name: impl-loop
-description: Carry an implementation request — a design or requirements document (typically a desk-loop deliverable), an issue, or a rough change request — through to code that has proved itself against a check the agent can run, and hand it over with an explicit list of what could not be verified. Invoked explicitly by the user; it never starts on its own. Deciding what to build belongs to desk-loop, splitting and writing commits to smart-commit.
+description: Carry an implementation request — a design or requirements document (typically a desk-loop deliverable), an issue, or a rough change request ("これを実装して", "この設計書どおりに作って", "この不具合を直して", "機能を追加して") — through to code that has proved itself against a check the agent can run, and hand it over with an explicit list of what could not be verified. Use whenever the work is to change code and the change carries judgment. Do not use for mechanical edits that carry none (formatting, renames, typo fixes), for deciding what to build (desk-loop), or for splitting and writing commits (smart-commit).
 argument-hint: A design document, an issue, or the change you want implemented.
-disable-model-invocation: true
 ---
 
 # Impl Loop
